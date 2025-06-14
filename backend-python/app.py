@@ -154,7 +154,7 @@ def api_docs():
 
 if __name__ == '__main__':
     # Create static directory if not exists
-    os.makedirs('static/stream', exist_ok=True)
+    os.makedirs('/stream', exist_ok=True)
     
     # Start Flask server
     app.run(

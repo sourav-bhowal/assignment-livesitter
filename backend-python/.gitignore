@@ -2,6 +2,6 @@
 __pycache__/
 
 # Environment variables
-.env
+.env*
 # Python bytecode
 *.pyc
