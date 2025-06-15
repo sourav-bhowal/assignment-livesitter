@@ -202,3 +202,41 @@ python app.py
 ### 6. Access the API
 
 Open your web browser and navigate to `http://localhost:5000/api/docs` to access the API documentation and test the endpoints.
+
+
+## Running the Frontend
+The frontend can interact with the API using standard HTTP requests. You can use libraries like Axios or Fetch API in JavaScript to make requests to the endpoints defined above.
+
+# Prerequisites
+- Node.js and npm installed
+
+## Installation
+### 1. Clone the repository and navigate to the frontend directory
+
+```bash
+git clone https://github.com/sourav-bhowal/assignment-livesitter.git
+
+cd assignment-livesitter/frontend-nextjs
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Set environment variables
+You can set environment variables in a `.env.local` file in the root of your Next.js project. Example `.env.local` file:
+
+```
+NEXT_PUBLIC_BACKEND_URL=http://localhost:5000/api
+NEXT_PUBLIC_BACKEND_HLS_URL=http://localhost:5000
+```
+### 4. Run the frontend
+
+```bash
+npm run dev
+```
+
+### 5. Access the frontend
+Open your web browser and navigate to `http://localhost:3000` to access the frontend application.
