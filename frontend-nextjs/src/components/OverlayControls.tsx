@@ -1,114 +1,104 @@
-"use client"
-import { useState, useEffect, useCallback } from "react"
-import axios from "axios"
-import { Plus, Loader2, Type, ImageIcon, AlertCircle, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-// import { Label } from "@/components/ui/label"
-// import { ScrollArea } from "@/components/ui/scroll-area"
-import { overlay } from "@/lib/utils"
+"use client";
+import { useState } from "react";
+import {
+  Plus,
+  Loader2,
+  Type,
+  ImageIcon,
+  AlertCircle,
+  Trash2,
+  Edit2,
+  Check,
+  X,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useOverlay } from "@/context/OverlayContext";
+import { overlay } from "@/lib/utils";
 
-const OverlayControls = () => {
-  const [overlays, setOverlays] = useState<overlay[]>([])
-  const [newText, setNewText] = useState("")
-  const [newImageUrl, setNewImageUrl] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
-  const [isAdding, setIsAdding] = useState(false)
-  const [error, setError] = useState("")
-
-  // Load overlays
-  const loadOverlays = useCallback(async () => {
-    try {
-      setError("")
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays`)
-      setOverlays(res.data)
-    } catch (err) {
-      console.error("Failed to load overlays", err)
-      setError("Failed to load overlays")
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
+const OverlayControls = ({ streamId }: { streamId: string }) => {
+  const [newText, setNewText] = useState("");
+  const [newImageUrl, setNewImageUrl] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
+  const [editingOverlayId, setEditingOverlayId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
+  const {
+    overlays,
+    isLoading,
+    error,
+    addOverlay,
+    deleteOverlay,
+    updateOverlay,
+  } = useOverlay();
 
   // Add text overlay
-  const addTextOverlay = async () => {
-    if (!newText.trim()) return
+  const handleAddTextOverlay = async () => {
+    if (!newText.trim()) return;
 
-    setIsAdding(true)
-    setError("")
-
+    setIsAdding(true);
     try {
-      const newOverlay = {
+      await addOverlay(streamId, {
         type: "text",
         content: newText.trim(),
         position: { x: 50, y: 50 },
         size: { width: 200, height: 60 },
-      }
-
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays`, newOverlay)
-      setNewText("")
-      await loadOverlays()
-    } catch (err) {
-      console.error("Failed to add text overlay", err)
-      setError("Failed to add overlay")
+      });
+      setNewText("");
     } finally {
-      setIsAdding(false)
+      setIsAdding(false);
     }
-  }
+  };
 
   // Add image overlay
-  const addImageOverlay = async () => {
-    if (!newImageUrl.trim()) return
+  const handleAddImageOverlay = async () => {
+    if (!newImageUrl.trim()) return;
 
-    setIsAdding(true)
-    setError("")
-
+    setIsAdding(true);
     try {
-      const newOverlay = {
+      await addOverlay(streamId, {
         type: "image",
         content: newImageUrl.trim(),
         position: { x: 100, y: 100 },
         size: { width: 150, height: 150 },
-      }
-
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays`, newOverlay)
-      setNewImageUrl("")
-      await loadOverlays()
-    } catch (err) {
-      console.error("Failed to add image overlay", err)
-      setError("Failed to add overlay")
+      });
+      setNewImageUrl("");
     } finally {
-      setIsAdding(false)
+      setIsAdding(false);
     }
-  }
+  };
 
-  // Delete overlay
-  // const deleteOverlay = async (id: string) => {
-  //   try {
-  //     setError("")
-  //     await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays/${id}`)
-  //     await loadOverlays()
-  //   } catch (err) {
-  //     console.error("Failed to delete overlay", err)
-  //     setError("Failed to delete overlay")
-  //   }
-  // }
+  const handleStartEdit = (overlay: overlay) => {
+    setEditingOverlayId(overlay._id);
+    setEditText(overlay.content);
+  };
 
-  useEffect(() => {
-    loadOverlays()
-  }, [loadOverlays])
+  const handleSaveEdit = async () => {
+    if (!editingOverlayId || !editText.trim()) return;
+
+    try {
+      await updateOverlay(editingOverlayId, { content: editText.trim() });
+      setEditingOverlayId(null);
+      setEditText("");
+    } catch (err) {
+      console.error("Failed to update overlay text", err);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingOverlayId(null);
+    setEditText("");
+  };
 
   return (
     <div className="h-full flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-white text-lg mt-5">Overlays</CardTitle>
-          {/* <Badge variant="secondary" className="text-xs">
-            {overlays.length}
-          </Badge> */}
         </div>
       </CardHeader>
 
@@ -116,11 +106,17 @@ const OverlayControls = () => {
         {/* Add Overlay Controls */}
         <Tabs defaultValue="text" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
-            <TabsTrigger value="text" className="text-xs data-[state=active]:bg-purple-600">
+            <TabsTrigger
+              value="text"
+              className="text-xs data-[state=active]:bg-purple-600"
+            >
               <Type className="h-3 w-3 mr-1" />
               Text
             </TabsTrigger>
-            <TabsTrigger value="image" className="text-xs data-[state=active]:bg-purple-600">
+            <TabsTrigger
+              value="image"
+              className="text-xs data-[state=active]:bg-purple-600"
+            >
               <ImageIcon className="h-3 w-3 mr-1" />
               Image
             </TabsTrigger>
@@ -135,12 +131,16 @@ const OverlayControls = () => {
               disabled={isAdding}
             />
             <Button
-              onClick={addTextOverlay}
+              onClick={handleAddTextOverlay}
               disabled={!newText.trim() || isAdding}
               size="sm"
               className="w-full bg-purple-600 hover:bg-purple-700"
             >
-              {isAdding ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+              {isAdding ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Plus className="h-3 w-3" />
+              )}
             </Button>
           </TabsContent>
 
@@ -153,12 +153,16 @@ const OverlayControls = () => {
               disabled={isAdding}
             />
             <Button
-              onClick={addImageOverlay}
+              onClick={handleAddImageOverlay}
               disabled={!newImageUrl.trim() || isAdding}
               size="sm"
               className="w-full bg-purple-600 hover:bg-purple-700"
             >
-              {isAdding ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+              {isAdding ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Plus className="h-3 w-3" />
+              )}
             </Button>
           </TabsContent>
         </Tabs>
@@ -172,7 +176,7 @@ const OverlayControls = () => {
         )}
 
         {/* Overlay List */}
-        {/* <div className="space-y-2">
+        <div className="space-y-2">
           <Label className="text-slate-300 text-sm">Active Overlays</Label>
           <ScrollArea className="h-48">
             {isLoading ? (
@@ -195,39 +199,82 @@ const OverlayControls = () => {
                         {index + 1}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1">
-                          {overlay.type === "text" ? (
-                            <Type className="h-3 w-3 text-slate-400" />
-                          ) : (
-                            <ImageIcon className="h-3 w-3 text-slate-400" />
-                          )}
-                          <span className="text-white text-xs truncate">
-                            {overlay.type === "text"
-                              ? overlay.content.length > 15
-                                ? `${overlay.content.substring(0, 15)}...`
-                                : overlay.content
-                              : "Image"}
-                          </span>
-                        </div>
-                        <div className="text-xs text-slate-400">
-                          {overlay.position.x},{overlay.position.y}
-                        </div>
+                        {editingOverlayId === overlay._id &&
+                        overlay.type === "text" ? (
+                          <div className="flex items-center gap-2">
+                            <Input
+                              value={editText}
+                              onChange={(e) => setEditText(e.target.value)}
+                              className="h-6 text-xs bg-slate-700/50 border-slate-600 text-white"
+                              autoFocus
+                            />
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={handleSaveEdit}
+                              className="h-6 w-6 p-0 text-green-400 hover:text-green-300 hover:bg-green-500/10"
+                            >
+                              <Check className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={handleCancelEdit}
+                              className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center gap-1">
+                              {overlay.type === "text" ? (
+                                <Type className="h-3 w-3 text-slate-400" />
+                              ) : (
+                                <ImageIcon className="h-3 w-3 text-slate-400" />
+                              )}
+                              <span className="text-white text-xs truncate">
+                                {overlay.type === "text"
+                                  ? overlay.content.length > 15
+                                    ? `${overlay.content.substring(0, 15)}...`
+                                    : overlay.content
+                                  : "Image"}
+                              </span>
+                            </div>
+                            <div className="text-xs text-slate-400">
+                              {overlay.position.x},{overlay.position.y}
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteOverlay(overlay._id)}
-                      className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      {overlay.type === "text" &&
+                        editingOverlayId !== overlay._id && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleStartEdit(overlay)}
+                            className="h-6 w-6 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                          >
+                            <Edit2 className="h-3 w-3" />
+                          </Button>
+                        )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteOverlay(overlay._id)}
+                        className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
           </ScrollArea>
-        </div> */}
+        </div>
 
         {/* Instructions */}
         <div className="text-xs text-slate-400 space-y-1 mb-2 pt-2 border-t border-slate-700/50">
@@ -237,7 +284,7 @@ const OverlayControls = () => {
         </div>
       </CardContent>
     </div>
-  )
-}
+  );
+};
 
-export default OverlayControls
+export default OverlayControls;

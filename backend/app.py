@@ -133,6 +133,9 @@ def stop_stream(stream_id):
                 os.remove(os.path.join(output_dir, file))
             os.rmdir(output_dir)
 
+        # delete the overlays for this stream
+        overlays.delete_many({"stream_id": stream_id})
+
         return jsonify({"message": "Stream stopped successfully"}), 200
 
     return jsonify({"error": "No active stream found with that ID"}), 400
@@ -149,7 +152,7 @@ def create_overlay():
     print(f"Received data: {data}")
     
     # Validate required fields
-    if not data.get('type') or not data.get('content'):
+    if not data.get('type') or not data.get('content') or not data.get('stream_id'):
         return jsonify({"error": "Type and content are required"}), 400
     
     # Insert into database
@@ -160,14 +163,17 @@ def create_overlay():
     }), 201
 
 # Route to get all overlays
-@app.route('/api/overlays', methods=['GET'])
-def get_overlays():
-    overlay_list = [
-        {**overlay, '_id': str(overlay['_id'])}
-        for overlay in overlays.find({})
-    ]
-    return jsonify(overlay_list)
-
+@app.route('/api/overlays/<stream_id>', methods=['GET'])
+def get_overlays(stream_id):
+    # Fetch overlays for the given stream ID
+    overlay_list = list(overlays.find({"stream_id": stream_id}))
+    
+    # Convert ObjectId to string for JSON serialization
+    for overlay in overlay_list:
+        overlay["_id"] = str(overlay["_id"])
+    
+    return jsonify(overlay_list), 200
+    
 # Routes to manage overlays by ID
 @app.route('/api/overlays/<id>', methods=['PUT'])
 def update_overlay(id):
@@ -196,7 +202,7 @@ def api_docs():
             "POST /api/stream/stop/<stream_id>": "Stop current stream",
             "GET /stream/stream.m3u8": "HLS master playlist",
             "POST /api/overlays": "Create new overlay",
-            "GET /api/overlays": "Get all overlays",
+            "GET /api/overlays/<stream_id>": "Get all overlays",
             "PUT /api/overlays/<id>": "Update overlay",
             "DELETE /api/overlays/<id>": "Delete overlay"
         },
@@ -215,7 +221,7 @@ def api_docs():
 
 # Main entry point to start the app and continuous stream
 if __name__ == '__main__':
-    start_continuous_stream_on_boot()
+    # start_continuous_stream_on_boot()
     app.run(
         debug=os.getenv('DEBUG', 'False') == 'True',
         host=os.getenv('HOST'), 
