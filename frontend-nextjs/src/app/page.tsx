@@ -16,8 +16,8 @@ import {
   CheckCircle,
   ArrowRight,
   Star,
-  Menu,
-  X,
+  // Menu,
+  // X,
 } from "lucide-react";
 import Link from "next/link";
 import { VideoPlayer } from "@/components/VideoPlayer";
@@ -66,7 +66,7 @@ export default function RTSPStreamingLanding() {
   const stats = [
     { value: "99.9%", label: "Uptime" },
     { value: "100ms", label: "Latency" },
-    { value: "50M+", label: "Streams Delivered" },
+    { value: "50M+", label: "Streams" },
     { value: "180+", label: "Countries" },
   ];
 
@@ -78,10 +78,10 @@ export default function RTSPStreamingLanding() {
           <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
             <Play className="h-4 w-4 text-white" />
           </div>
-          <span className="text-xl font-bold text-white">StreamPro</span>
+          <span className="text-xl font-bold text-white">LiveSitter</span>
         </Link>
 
-        <nav className="ml-auto hidden md:flex gap-6">
+        <nav className="ml-auto flex gap-6">
           {["My Stream"].map((item) => (
             <Link
               key={item}
@@ -102,7 +102,7 @@ export default function RTSPStreamingLanding() {
           </Button>
         </div>
 
-        <Button
+        {/* <Button
           variant="ghost"
           size="icon"
           className="ml-auto md:hidden text-white"
@@ -113,17 +113,17 @@ export default function RTSPStreamingLanding() {
           ) : (
             <Menu className="h-6 w-6" />
           )}
-        </Button>
+        </Button> */}
       </header>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-40 bg-black/95 backdrop-blur-md md:hidden">
           <div className="flex flex-col items-center justify-center h-full space-y-8">
-            {["Features", "Pricing", "Docs", "Support"].map((item) => (
+            {["My Stream"].map((item) => (
               <Link
                 key={item}
-                href={`#${item.toLowerCase()}`}
+                href={`/my-stream`}
                 className="text-2xl font-medium text-white hover:text-purple-400 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -133,7 +133,7 @@ export default function RTSPStreamingLanding() {
             <div className="flex flex-col gap-4 mt-8">
               <Button
                 variant="outline"
-                className="text-white border-white hover:bg-white hover:text-black"
+                className="text-black border-white hover:bg-white hover:text-black"
               >
                 Sign In
               </Button>
@@ -242,7 +242,7 @@ export default function RTSPStreamingLanding() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-5xl font-bold text-white mb-4">
-              Why Choose StreamPro?
+              Why Choose LiveSitter?
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Built for professionals who demand the highest quality streaming
@@ -306,7 +306,7 @@ export default function RTSPStreamingLanding() {
                   Ready to Get Started?
                 </h3>
                 <p className="text-gray-300 mb-6">
-                  Join thousands of professionals who trust StreamPro for their
+                  Join thousands of professionals who trust LiveSitter for their
                   critical streaming needs.
                 </p>
                 <div className="flex items-center gap-4 mb-6">
@@ -350,7 +350,7 @@ export default function RTSPStreamingLanding() {
                 <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                   <Play className="h-4 w-4 text-white" />
                 </div>
-                <span className="text-xl font-bold text-white">StreamPro</span>
+                <span className="text-xl font-bold text-white">LiveSitter</span>
               </div>
               <p className="text-gray-400">
                 Professional RTSP streaming platform for mission-critical
@@ -394,7 +394,7 @@ export default function RTSPStreamingLanding() {
 
           <div className="border-t border-white/10 mt-12 pt-8 text-center text-gray-400">
             <p>
-              &copy; {new Date().getFullYear()} StreamPro. All rights reserved.
+              &copy; {new Date().getFullYear()} LiveSitter. All rights reserved.
             </p>
           </div>
         </div>

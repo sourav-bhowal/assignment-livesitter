@@ -168,10 +168,12 @@ export default function MyStreamPage() {
               {/* Video Player with Overlays */}
               {hlsUrl ? (
                 <div className="bg-black/20 backdrop-blur-lg rounded-2xl border border-white/10 p-6 shadow-2xl">
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className="flex md:items-center max-sm:flex-col gap-3 mb-4">
+                    <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                    <span className="text-white font-medium">Live Stream</span>
-                    <span className="text-slate-400 text-sm">
+                    <span className="text-white font-medium max-sm:text-sm">Live Stream</span>
+                    </div>
+                    <span className="text-slate-400 text-xs">
                       Stream ID: {streamId}
                     </span>
                   </div>
