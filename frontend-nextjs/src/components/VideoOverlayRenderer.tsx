@@ -5,6 +5,7 @@ import { OverlayItem } from "./OverlayItem";
 import { overlay } from "@/lib/utils";
 
 export const VideoOverlayRenderer = ({ streamId }: { streamId: string }) => {
+  // State to manage overlays and loading state
   const [overlays, setOverlays] = useState<overlay[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -56,6 +57,7 @@ export const VideoOverlayRenderer = ({ streamId }: { streamId: string }) => {
     return () => clearInterval(interval);
   }, [loadOverlays]);
 
+  // If still loading, return null to avoid rendering before data is ready
   if (isLoading) {
     return null;
   }

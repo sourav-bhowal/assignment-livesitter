@@ -5,24 +5,33 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import { overlay } from "@/lib/utils";
 
+// Define the props for the OverlayItem component
 interface OverlayItemProps {
   overlay: overlay;
   onUpdate: (id: string, updates: Partial<overlay>) => void;
   onDelete: (id: string) => void;
 }
 
+// OverlayItem component to render and manage individual overlays
 export const OverlayItem = ({ overlay, onUpdate, onDelete }: OverlayItemProps) => {
+  // Ref to the target element for Moveable
   const targetRef = useRef<HTMLDivElement>(null);
+
+  // Ref to store the current frame state
   const frameRef = useRef({
     translate: [overlay.position.x, overlay.position.y],
     width: overlay.size.width,
     height: overlay.size.height,
   });
 
+  // State to manage visibility of controls and interaction state
   const [showControls, setShowControls] = useState(false);
   const [isInteracting, setIsInteracting] = useState(false);
+
+  // Ref to manage hide timeout
   const hideTimeout = useRef<NodeJS.Timeout | null>(null);
 
+  // Effect to update the frame when overlay changes
   useEffect(() => {
     const frame = frameRef.current;
     frame.translate = [overlay.position.x, overlay.position.y];
@@ -31,6 +40,7 @@ export const OverlayItem = ({ overlay, onUpdate, onDelete }: OverlayItemProps) =
     updateTargetStyle();
   }, [overlay]);
 
+  // Function to update the target element's style based on the frame state
   const updateTargetStyle = () => {
     const el = targetRef.current;
     const frame = frameRef.current;
@@ -41,11 +51,13 @@ export const OverlayItem = ({ overlay, onUpdate, onDelete }: OverlayItemProps) =
     }
   };
 
+  // Handlers for mouse enter and leave events to show/hide controls
   const handleMouseEnter = () => {
     if (hideTimeout.current) clearTimeout(hideTimeout.current);
     setShowControls(true);
   };
 
+  // Handler for mouse leave event with a delay to prevent flicker
   const handleMouseLeave = () => {
     // Delay hiding so it doesn’t flicker during interaction
     hideTimeout.current = setTimeout(() => {
@@ -109,6 +121,7 @@ export const OverlayItem = ({ overlay, onUpdate, onDelete }: OverlayItemProps) =
         </div>
       </div>
 
+      {/* Moveable controls */}
       {showControls && (
         <Moveable
           target={targetRef}

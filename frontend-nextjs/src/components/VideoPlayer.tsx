@@ -1,8 +1,7 @@
 import { useRef, useEffect } from "react";
 import Hls from "hls.js";
 
-
-// VideoPlayer component
+// VideoPlayer props interface
 interface VideoPlayerProps {
   hlsUrl: string;
   className?: string;
@@ -11,6 +10,7 @@ interface VideoPlayerProps {
   muted?: boolean;
 }
 
+// VideoPlayer component to render HLS video streams
 export const VideoPlayer = ({
   hlsUrl,
   className,
@@ -25,13 +25,17 @@ export const VideoPlayer = ({
   useEffect(() => {
     if (!videoRef.current) return;
 
+    // create an instance of Hls
     let hls: Hls | null = null;
 
+    // If HLS is supported, load the source and attach to the video element
     if (Hls.isSupported()) {
       hls = new Hls();
       hls.loadSource(hlsUrl);
       hls.attachMedia(videoRef.current);
-    } else if (videoRef.current.canPlayType("application/vnd.apple.mpegurl")) {
+    }
+    // If the browser supports native HLS playback (like Safari), set the source directly
+    else if (videoRef.current.canPlayType("application/vnd.apple.mpegurl")) {
       videoRef.current.src = hlsUrl;
     }
 

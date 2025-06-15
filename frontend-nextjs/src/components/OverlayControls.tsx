@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const OverlayControls = ({ streamId }: { streamId: string }) => {
+  // State to manage new overlay inputs and loading state
   const [newText, setNewText] = useState("");
   const [newImageUrl, setNewImageUrl] = useState("");
   const [isAdding, setIsAdding] = useState(false);
