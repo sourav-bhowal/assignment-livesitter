@@ -202,7 +202,7 @@ def api_docs():
             "POST /api/stream/stop/<stream_id>": "Stop current stream",
             "GET /stream/stream.m3u8": "HLS master playlist",
             "POST /api/overlays": "Create new overlay",
-            "GET /api/overlays": "Get all overlays",
+            "GET /api/overlays/<stream_id>": "Get all overlays",
             "PUT /api/overlays/<id>": "Update overlay",
             "DELETE /api/overlays/<id>": "Delete overlay"
         },

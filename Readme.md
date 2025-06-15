@@ -151,6 +151,13 @@ To continuously stream from an RTSP source, you can use the `/hls/continuous/ind
 - FFmpeg installed and accessible in the system PATH
 - UV package manager installed (optional, for running the server)
 
+## Installation Prerequisites
+
+- Python: https://www.python.org/downloads
+- MongoDB: https://www.mongodb.com/try/download/community
+- FFmpeg: https://ffmpeg.org/download.html
+- UV: curl -Ls https://astro.build/install | bash
+
 ## Installation
 
 ### 1. Clone the repository and navigate to the backend directory
@@ -203,14 +210,16 @@ python app.py
 
 Open your web browser and navigate to `http://localhost:5000/api/docs` to access the API documentation and test the endpoints.
 
-
 ## Running the Frontend
+
 The frontend can interact with the API using standard HTTP requests. You can use libraries like Axios or Fetch API in JavaScript to make requests to the endpoints defined above.
 
 # Prerequisites
+
 - Node.js and npm installed
 
 ## Installation
+
 ### 1. Clone the repository and navigate to the frontend directory
 
 ```bash
@@ -226,12 +235,14 @@ npm install
 ```
 
 ### 3. Set environment variables
+
 You can set environment variables in a `.env.local` file in the root of your Next.js project. Example `.env.local` file:
 
 ```
 NEXT_PUBLIC_BACKEND_URL=http://localhost:5000/api
 NEXT_PUBLIC_BACKEND_HLS_URL=http://localhost:5000
 ```
+
 ### 4. Run the frontend
 
 ```bash
@@ -239,4 +250,5 @@ npm run dev
 ```
 
 ### 5. Access the frontend
+
 Open your web browser and navigate to `http://localhost:3000` to access the frontend application.
