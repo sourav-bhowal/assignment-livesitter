@@ -16,14 +16,11 @@ import {
   CheckCircle,
   ArrowRight,
   Star,
-  // Menu,
-  // X,
 } from "lucide-react";
 import Link from "next/link";
 import { VideoPlayer } from "@/components/VideoPlayer";
 
 export default function RTSPStreamingLanding() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -101,49 +98,7 @@ export default function RTSPStreamingLanding() {
             Get Started
           </Button>
         </div>
-
-        {/* <Button
-          variant="ghost"
-          size="icon"
-          className="ml-auto md:hidden text-white"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-        </Button> */}
       </header>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-black/95 backdrop-blur-md md:hidden">
-          <div className="flex flex-col items-center justify-center h-full space-y-8">
-            {["My Stream"].map((item) => (
-              <Link
-                key={item}
-                href={`/my-stream`}
-                className="text-2xl font-medium text-white hover:text-purple-400 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item}
-              </Link>
-            ))}
-            <div className="flex flex-col gap-4 mt-8">
-              <Button
-                variant="outline"
-                className="text-black border-white hover:bg-white hover:text-black"
-              >
-                Sign In
-              </Button>
-              <Button className="bg-gradient-to-r from-purple-500 to-pink-500">
-                Get Started
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">

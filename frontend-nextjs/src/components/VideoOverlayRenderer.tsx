@@ -1,10 +1,10 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import OverlayItem from "./OverlayItem";
+import { OverlayItem } from "./OverlayItem";
 import { overlay } from "@/lib/utils";
 
-const VideoOverlayRenderer = () => {
+export const VideoOverlayRenderer = ({ streamId }: { streamId: string }) => {
   const [overlays, setOverlays] = useState<overlay[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -12,7 +12,7 @@ const VideoOverlayRenderer = () => {
   const loadOverlays = useCallback(async () => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays/${streamId}`
       );
       setOverlays(res.data);
     } catch (err) {
@@ -20,17 +20,10 @@ const VideoOverlayRenderer = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [streamId]);
 
   // Update overlay
-  const updateOverlay = async (
-    id: string,
-    changes: {
-      position?: { x: number; y: number };
-      size?: { width: number; height: number };
-      content?: string;
-    }
-  ) => {
+  const updateOverlay = async (id: string, changes: Partial<overlay>) => {
     try {
       await axios.put(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays/${id}`,
@@ -80,5 +73,3 @@ const VideoOverlayRenderer = () => {
     </div>
   );
 };
-
-export default VideoOverlayRenderer;

@@ -1,9 +1,8 @@
 "use client";
-
 import { useRef, useState, useEffect } from "react";
 import Moveable from "react-moveable";
 import Image from "next/image";
-import { X, Edit3 } from "lucide-react";
+import { X } from "lucide-react";
 import { overlay } from "@/lib/utils";
 
 interface OverlayItemProps {
@@ -12,7 +11,7 @@ interface OverlayItemProps {
   onDelete: (id: string) => void;
 }
 
-const OverlayItem = ({ overlay, onUpdate, onDelete }: OverlayItemProps) => {
+export const OverlayItem = ({ overlay, onUpdate, onDelete }: OverlayItemProps) => {
   const targetRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef({
     translate: [overlay.position.x, overlay.position.y],
@@ -21,10 +20,10 @@ const OverlayItem = ({ overlay, onUpdate, onDelete }: OverlayItemProps) => {
   });
 
   const [showControls, setShowControls] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const hideTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Sync position and size from backend
     const frame = frameRef.current;
     frame.translate = [overlay.position.x, overlay.position.y];
     frame.width = overlay.size.width;
@@ -42,12 +41,24 @@ const OverlayItem = ({ overlay, onUpdate, onDelete }: OverlayItemProps) => {
     }
   };
 
+  const handleMouseEnter = () => {
+    if (hideTimeout.current) clearTimeout(hideTimeout.current);
+    setShowControls(true);
+  };
+
+  const handleMouseLeave = () => {
+    // Delay hiding so it doesn’t flicker during interaction
+    hideTimeout.current = setTimeout(() => {
+      if (!isInteracting) setShowControls(false);
+    }, 300);
+  };
+
   return (
     <>
       <div
         ref={targetRef}
-        onMouseEnter={() => setShowControls(true)}
-        onMouseLeave={() => setShowControls(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className="absolute border border-dashed border-transparent hover:border-blue-500 rounded-lg cursor-move"
         style={{
           zIndex: 10,
@@ -62,9 +73,7 @@ const OverlayItem = ({ overlay, onUpdate, onDelete }: OverlayItemProps) => {
               contentEditable
               suppressContentEditableWarning
               className="w-full h-full text-center text-black outline-none p-1 cursor-text"
-              onFocus={() => setIsEditing(true)}
               onBlur={(e) => {
-                setIsEditing(false);
                 const newText = e.currentTarget.textContent?.trim() || "";
                 if (newText && newText !== overlay.content) {
                   onUpdate(overlay._id, { content: newText });
@@ -92,7 +101,7 @@ const OverlayItem = ({ overlay, onUpdate, onDelete }: OverlayItemProps) => {
           {showControls && (
             <button
               onClick={() => onDelete(overlay._id)}
-              className="absolute top-0 right-1 bg-red-500 text-white rounded-full p-1"
+              className="absolute top-0 right-1 bg-red-500 text-white rounded-full p-1 cursor-pointer"
             >
               <X size={12} />
             </button>
@@ -100,35 +109,40 @@ const OverlayItem = ({ overlay, onUpdate, onDelete }: OverlayItemProps) => {
         </div>
       </div>
 
-      <Moveable
-        target={targetRef}
-        draggable
-        resizable
-        origin={false}
-        onDrag={({ beforeTranslate }) => {
-          frameRef.current.translate = beforeTranslate;
-          updateTargetStyle();
-        }}
-        onDragEnd={() => {
-          const [x, y] = frameRef.current.translate;
-          onUpdate(overlay._id, { position: { x, y } });
-        }}
-        onResize={({ width, height, drag }) => {
-          frameRef.current.width = width;
-          frameRef.current.height = height;
-          frameRef.current.translate = drag.beforeTranslate;
-          updateTargetStyle();
-        }}
-        onResizeEnd={() => {
-          const frame = frameRef.current;
-          onUpdate(overlay._id, {
-            size: { width: frame.width, height: frame.height },
-            position: { x: frame.translate[0], y: frame.translate[1] },
-          });
-        }}
-      />
+      {showControls && (
+        <Moveable
+          target={targetRef}
+          draggable
+          resizable
+          origin={false}
+          onDragStart={() => setIsInteracting(true)}
+          onDrag={({ beforeTranslate }) => {
+            frameRef.current.translate = beforeTranslate;
+            updateTargetStyle();
+          }}
+          onDragEnd={() => {
+            const [x, y] = frameRef.current.translate;
+            onUpdate(overlay._id, { position: { x, y } });
+            setIsInteracting(false);
+          }}
+          onResizeStart={() => setIsInteracting(true)}
+          onResize={({ width, height, drag }) => {
+            frameRef.current.width = width;
+            frameRef.current.height = height;
+            frameRef.current.translate = drag.beforeTranslate;
+            updateTargetStyle();
+          }}
+          onResizeEnd={() => {
+            const frame = frameRef.current;
+            onUpdate(overlay._id, {
+              size: { width: frame.width, height: frame.height },
+              position: { x: frame.translate[0], y: frame.translate[1] },
+            });
+            setIsInteracting(false);
+          }}
+        />
+      )}
     </>
   );
 };
 
-export default OverlayItem;

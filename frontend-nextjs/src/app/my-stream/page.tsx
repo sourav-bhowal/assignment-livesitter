@@ -1,10 +1,9 @@
 "use client";
-
 import { useState } from "react";
 import axios from "axios";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import OverlayControls from "@/components/OverlayControls";
-import VideoOverlayRenderer from "@/components/VideoOverlayRenderer"; // Import VideoOverlayRenderer
+import { VideoOverlayRenderer } from "@/components/VideoOverlayRenderer";
 import { Play, Loader2, Video, Wifi } from "lucide-react";
 
 export default function MyStreamPage() {
@@ -43,7 +42,9 @@ export default function MyStreamPage() {
   const stopStream = async () => {
     setLoading(true);
     try {
-      await axios.post(`http://localhost:5000/api/stop-stream/${streamId}`);
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/stop-stream/${streamId}`
+      );
       setHlsUrl(null);
       setStreamId("");
       setRtspUrl("");
@@ -53,10 +54,10 @@ export default function MyStreamPage() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-5">
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-purple-900/30 to-slate-900/50"></div>
       <div
         className="absolute inset-0"
@@ -124,24 +125,24 @@ export default function MyStreamPage() {
                       </>
                     )}
                   </button>
-                  {
-                    hlsUrl && (
-                      <button
-                        onClick={stopStream}
-                        className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl flex items-center justify-center gap-3"
-                      >
-                        <Video className="w-4 h-4" />
-                        Stop Stream
-                      </button>
-                    )
-                  }
+                  {hlsUrl && (
+                    <button
+                      onClick={stopStream}
+                      className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl flex items-center justify-center gap-3"
+                    >
+                      <Video className="w-4 h-4" />
+                      Stop Stream
+                    </button>
+                  )}
                 </div>
               </div>
 
               {/* Overlay Controls */}
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl overflow-hidden">
-                <OverlayControls />
-              </div>
+              {hlsUrl && (
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl overflow-hidden">
+                  <OverlayControls streamId={streamId} />
+                </div>
+              )}
             </div>
 
             {/* Right Column - Video Player */}
@@ -170,8 +171,10 @@ export default function MyStreamPage() {
                 <div className="bg-black/20 backdrop-blur-lg rounded-2xl border border-white/10 p-6 shadow-2xl">
                   <div className="flex md:items-center max-sm:flex-col gap-3 mb-4">
                     <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                    <span className="text-white font-medium max-sm:text-sm">Live Stream</span>
+                      <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                      <span className="text-white font-medium max-sm:text-sm">
+                        Live Stream
+                      </span>
                     </div>
                     <span className="text-slate-400 text-xs">
                       Stream ID: {streamId}
@@ -190,7 +193,7 @@ export default function MyStreamPage() {
 
                       {/* Overlay Container - positioned absolutely over the video */}
                       <div className="absolute inset-0 pointer-events-none">
-                        <VideoOverlayRenderer />
+                        <VideoOverlayRenderer streamId={streamId} />
                       </div>
                     </div>
                   </div>
