@@ -156,7 +156,10 @@ To continuously stream from an RTSP source, you can use the `/hls/continuous/ind
 - Python: https://www.python.org/downloads
 - MongoDB: https://www.mongodb.com/try/download/community
 - FFmpeg: https://ffmpeg.org/download.html
-- UV: curl -Ls https://astro.build/install | bash
+- UV: 
+```bash
+curl -Ls https://astro.build/install | bash
+```
 
 ## Installation
 
