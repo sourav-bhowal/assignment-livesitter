@@ -70,6 +70,7 @@ def start_continuous_stream_on_boot():
     else:
         print("ERROR: HLS stream not ready in time")
 
+# Route to start a new RTSP stream
 @app.route('/api/start-stream', methods=['POST'])
 def start_stream():
     rtsp_url = request.json.get("rtsp_url")
@@ -112,7 +113,7 @@ def start_stream():
     except Exception as e:
         return jsonify({"error": f"Failed to start stream: {str(e)}"}), 500
 
-
+# Route to stop a specific RTSP stream
 @app.route('/api/stop-stream/<stream_id>', methods=['POST', 'OPTIONS'])
 def stop_stream(stream_id):
     if request.method == 'OPTIONS':
@@ -192,7 +193,7 @@ def api_docs():
     return jsonify({
         "endpoints": {
             "POST /api/stream/start": "Start RTSP stream conversion",
-            "POST /api/stream/stop": "Stop current stream",
+            "POST /api/stream/stop/<stream_id>": "Stop current stream",
             "GET /stream/stream.m3u8": "HLS master playlist",
             "POST /api/overlays": "Create new overlay",
             "GET /api/overlays": "Get all overlays",
@@ -212,6 +213,7 @@ def api_docs():
         }
     })
 
+# Main entry point to start the app and continuous stream
 if __name__ == '__main__':
     start_continuous_stream_on_boot()
     app.run(
