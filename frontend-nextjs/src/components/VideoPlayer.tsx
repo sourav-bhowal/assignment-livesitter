@@ -1,13 +1,27 @@
 import { useRef, useEffect } from "react";
 import Hls from "hls.js";
 
+
+// VideoPlayer component
 interface VideoPlayerProps {
   hlsUrl: string;
+  className?: string;
+  controls?: boolean;
+  autoplay?: boolean;
+  muted?: boolean;
 }
 
-const VideoPlayer = ({ hlsUrl }: VideoPlayerProps) => {
+export const VideoPlayer = ({
+  hlsUrl,
+  className,
+  controls,
+  autoplay,
+  muted,
+}: VideoPlayerProps) => {
+  // Reference to the video element
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  // Effect to initialize HLS.js and attach it to the video element
   useEffect(() => {
     if (!videoRef.current) return;
 
@@ -21,6 +35,7 @@ const VideoPlayer = ({ hlsUrl }: VideoPlayerProps) => {
       videoRef.current.src = hlsUrl;
     }
 
+    // Cleanup function to destroy HLS instance when component unmounts
     return () => {
       hls?.destroy();
     };
@@ -29,12 +44,12 @@ const VideoPlayer = ({ hlsUrl }: VideoPlayerProps) => {
   return (
     <video
       ref={videoRef}
-      autoPlay
-      controls
+      autoPlay={autoplay}
+      controls={controls}
+      muted={muted}
       controlsList="nodownload nofullscreen"
       style={{ width: "100%", height: "100%", objectFit: "contain" }}
+      className={className}
     />
   );
 };
-
-export default VideoPlayer;

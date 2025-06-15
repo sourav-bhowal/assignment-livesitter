@@ -1,39 +1,46 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Moveable from "react-moveable";
 import Image from "next/image";
+import { X, Edit3 } from "lucide-react";
+import { overlay } from "@/lib/utils";
 
-const OverlayItem = ({
-  overlay,
-  onUpdate,
-  onDelete,
-}: {
-  overlay: {
-    _id: string;
-    type: string;
-    content: string;
-    position: { x: number; y: number };
-    size: { width: number; height: number };
-  };
-  onUpdate: (
-    id: string,
-    updates: Partial<{
-      position: { x: number; y: number };
-      size: { width: number; height: number };
-      content: string;
-    }>
-  ) => void;
+interface OverlayItemProps {
+  overlay: overlay;
+  onUpdate: (id: string, updates: Partial<overlay>) => void;
   onDelete: (id: string) => void;
-}) => {
+}
+
+const OverlayItem = ({ overlay, onUpdate, onDelete }: OverlayItemProps) => {
   const targetRef = useRef<HTMLDivElement>(null);
-  const [frame, setFrame] = useState({
+  const frameRef = useRef({
     translate: [overlay.position.x, overlay.position.y],
     width: overlay.size.width,
     height: overlay.size.height,
   });
 
   const [showControls, setShowControls] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    // Sync position and size from backend
+    const frame = frameRef.current;
+    frame.translate = [overlay.position.x, overlay.position.y];
+    frame.width = overlay.size.width;
+    frame.height = overlay.size.height;
+    updateTargetStyle();
+  }, [overlay]);
+
+  const updateTargetStyle = () => {
+    const el = targetRef.current;
+    const frame = frameRef.current;
+    if (el) {
+      el.style.transform = `translate(${frame.translate[0]}px, ${frame.translate[1]}px)`;
+      el.style.width = `${frame.width}px`;
+      el.style.height = `${frame.height}px`;
+    }
+  };
 
   return (
     <>
@@ -41,25 +48,34 @@ const OverlayItem = ({
         ref={targetRef}
         onMouseEnter={() => setShowControls(true)}
         onMouseLeave={() => setShowControls(false)}
-        className="group absolute border border-gray-300 rounded shadow text-black"
+        className="absolute border border-dashed border-transparent hover:border-blue-500 rounded-lg cursor-move"
         style={{
-          width: `${frame.width}px`,
-          height: `${frame.height}px`,
-          transform: `translate(${frame.translate[0]}px, ${frame.translate[1]}px)`,
           zIndex: 10,
+          transform: `translate(${overlay.position.x}px, ${overlay.position.y}px)`,
+          width: overlay.size.width,
+          height: overlay.size.height,
         }}
       >
-        <div className="relative w-full h-full flex items-center justify-center">
+        <div className="w-full h-full relative bg-white/10 backdrop-blur-sm flex items-center justify-center rounded-lg">
           {overlay.type === "text" ? (
             <div
               contentEditable
               suppressContentEditableWarning
-              className="outline-none bg-transparent w-full h-full flex items-center justify-center text-center p-1"
+              className="w-full h-full text-center text-black outline-none p-1 cursor-text"
+              onFocus={() => setIsEditing(true)}
               onBlur={(e) => {
-                const newText = e.currentTarget.textContent ?? "";
-                if (newText !== overlay.content) {
+                setIsEditing(false);
+                const newText = e.currentTarget.textContent?.trim() || "";
+                if (newText && newText !== overlay.content) {
                   onUpdate(overlay._id, { content: newText });
                 }
+              }}
+              style={{
+                fontSize: `${Math.min(
+                  frameRef.current.width / 8,
+                  frameRef.current.height / 3,
+                  24
+                )}px`,
               }}
             >
               {overlay.content}
@@ -67,72 +83,48 @@ const OverlayItem = ({
           ) : (
             <Image
               src={overlay.content}
-              alt="overlay"
+              alt="Overlay"
               fill
-              style={{ objectFit: "contain" }}
+              className="object-contain rounded"
             />
           )}
 
-          {/* Delete button */}
-          <button
-            onClick={() => onDelete(overlay._id)}
-            className={`absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700 transition-colors ${
-              showControls ? "opacity-100" : "opacity-0"
-            }`}
-            style={{
-              zIndex: 20,
-              cursor: "pointer",
-              transition: "opacity 0.2s",
-            }}
-          >
-            ✕
-          </button>
+          {showControls && (
+            <button
+              onClick={() => onDelete(overlay._id)}
+              className="absolute top-0 right-1 bg-red-500 text-white rounded-full p-1"
+            >
+              <X size={12} />
+            </button>
+          )}
         </div>
       </div>
 
       <Moveable
         target={targetRef}
         draggable
-        resizable={true}
+        resizable
         origin={false}
-        edge={false}
-        renderDirections={showControls ? ["nw", "ne", "sw", "se"] : []}
         onDrag={({ beforeTranslate }) => {
-          setFrame((prev) => ({
-            ...prev,
-            translate: beforeTranslate,
-          }));
+          frameRef.current.translate = beforeTranslate;
+          updateTargetStyle();
         }}
-        onDragEnd={({ lastEvent }) => {
-          if (lastEvent) {
-            onUpdate(overlay._id, {
-              position: {
-                x: lastEvent.beforeTranslate[0],
-                y: lastEvent.beforeTranslate[1],
-              },
-            });
-          }
+        onDragEnd={() => {
+          const [x, y] = frameRef.current.translate;
+          onUpdate(overlay._id, { position: { x, y } });
         }}
         onResize={({ width, height, drag }) => {
-          setFrame({
-            width,
-            height,
-            translate: drag.beforeTranslate,
-          });
+          frameRef.current.width = width;
+          frameRef.current.height = height;
+          frameRef.current.translate = drag.beforeTranslate;
+          updateTargetStyle();
         }}
-        onResizeEnd={({ lastEvent }) => {
-          if (lastEvent) {
-            onUpdate(overlay._id, {
-              size: {
-                width: lastEvent.width,
-                height: lastEvent.height,
-              },
-              position: {
-                x: lastEvent.drag.beforeTranslate[0],
-                y: lastEvent.drag.beforeTranslate[1],
-              },
-            });
-          }
+        onResizeEnd={() => {
+          const frame = frameRef.current;
+          onUpdate(overlay._id, {
+            size: { width: frame.width, height: frame.height },
+            position: { x: frame.translate[0], y: frame.translate[1] },
+          });
         }}
       />
     </>
