@@ -22,8 +22,8 @@ db = client["stream_app"]
 overlays = db["overlays"]
 
 # Global variable to track FFmpeg process and continuous stream
-ffmpeg_processes = {}
-continuous_ffmpeg_process = None
+ffmpeg_processes = {}   # Dictionary to hold active FFmpeg processes
+continuous_ffmpeg_process = None # Process for continuous stream
 continuous_stream_id = "continuous"
 continuous_output_dir = f"static/hls/{continuous_stream_id}"
 continuous_output_path = f"{continuous_output_dir}/index.m3u8"

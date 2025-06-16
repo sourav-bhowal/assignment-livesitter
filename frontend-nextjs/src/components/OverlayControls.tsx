@@ -22,11 +22,14 @@ import { useOverlay } from "@/context/OverlayContext";
 import { overlay } from "@/lib/utils";
 
 const OverlayControls = ({ streamId }: { streamId: string }) => {
+  // State variables for managing overlays
   const [newText, setNewText] = useState("");
   const [newImageUrl, setNewImageUrl] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [editingOverlayId, setEditingOverlayId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+
+  // Use OverlayContext to access overlays and related functions
   const {
     overlays,
     isLoading,
@@ -72,11 +75,13 @@ const OverlayControls = ({ streamId }: { streamId: string }) => {
     }
   };
 
+  // Start editing an overlay
   const handleStartEdit = (overlay: overlay) => {
     setEditingOverlayId(overlay._id);
     setEditText(overlay.content);
   };
 
+  // Save edited overlay text
   const handleSaveEdit = async () => {
     if (!editingOverlayId || !editText.trim()) return;
 
@@ -89,11 +94,13 @@ const OverlayControls = ({ streamId }: { streamId: string }) => {
     }
   };
 
+  // Cancel editing an overlay
   const handleCancelEdit = () => {
     setEditingOverlayId(null);
     setEditText("");
   };
 
+  // Render component
   return (
     <div className="h-full flex flex-col">
       <CardHeader className="pb-3">
@@ -242,7 +249,14 @@ const OverlayControls = ({ streamId }: { streamId: string }) => {
                               </span>
                             </div>
                             <div className="text-xs text-slate-400">
-                              {overlay.position.x},{overlay.position.y}
+                              <p>
+                                Position: {overlay.position.x}px,{" "}
+                                {overlay.position.y}px
+                              </p>
+                              <p>
+                                Size: {overlay.size.width}px x{" "}
+                                {overlay.size.height}px
+                              </p>
                             </div>
                           </>
                         )}

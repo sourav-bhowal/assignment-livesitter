@@ -91,9 +91,6 @@ export default function RTSPStreamingLanding() {
         </nav>
 
         <div className="ml-6 hidden md:flex gap-2">
-          <Button variant="ghost" className="text-white hover:bg-white/10">
-            Sign In
-          </Button>
           <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition-all duration-200">
             Get Started
           </Button>

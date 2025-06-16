@@ -5,6 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// Interface for overlay items used in the application
 export interface overlay {
   _id: string
   type: "text" | "image"

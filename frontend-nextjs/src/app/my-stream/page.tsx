@@ -7,11 +7,14 @@ import VideoOverlayRenderer from "@/components/VideoOverlayRenderer";
 import { Play, Loader2, Video, Wifi } from "lucide-react";
 
 export default function MyStreamPage() {
+  // State variables to manage RTSP URL, HLS URL, stream ID, and loading state
   const [rtspUrl, setRtspUrl] = useState<string>("");
   const [hlsUrl, setHlsUrl] = useState<string | null>(null);
   const [streamId, setStreamId] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
+  // Function to start the stream by sending RTSP URL to the backend
+  // It handles the response to set the HLS URL and stream ID
   const startStream = async () => {
     if (!rtspUrl) {
       alert("Please enter a valid RTSP URL");
@@ -39,6 +42,8 @@ export default function MyStreamPage() {
     }
   };
 
+  // Function to stop the stream by sending a request to the backend
+  // It resets the HLS URL and stream ID
   const stopStream = async () => {
     setLoading(true);
     try {
@@ -56,6 +61,7 @@ export default function MyStreamPage() {
     }
   };
 
+  // Render the main streaming interface with controls and video player
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-5">
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-purple-900/30 to-slate-900/50"></div>

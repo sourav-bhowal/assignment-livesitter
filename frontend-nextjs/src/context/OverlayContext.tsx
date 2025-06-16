@@ -1,5 +1,4 @@
 "use client";
-
 import {
   createContext,
   useContext,
@@ -10,6 +9,7 @@ import {
 import axios from "axios";
 import { overlay } from "@/lib/utils";
 
+// Interface for the overlay context
 interface OverlayContextType {
   overlays: overlay[];
   isLoading: boolean;
@@ -20,13 +20,17 @@ interface OverlayContextType {
   deleteOverlay: (id: string) => Promise<void>;
 }
 
+// Create the context with a default value of undefined
 const OverlayContext = createContext<OverlayContextType | undefined>(undefined);
 
 export function OverlayProvider({ children }: { children: ReactNode }) {
+  // State to hold overlays, loading state, and error message
   const [overlays, setOverlays] = useState<overlay[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Function to load overlays for a specific stream
+  // It fetches overlays from the backend and updates the state
   const loadOverlays = useCallback(
     async (streamId: string) => {
       try {
@@ -48,6 +52,8 @@ export function OverlayProvider({ children }: { children: ReactNode }) {
     [overlays.length]
   );
 
+  // Functions to add, update, and delete overlays
+  // These functions interact with the backend API to manage overlays
   const addOverlay = useCallback(
     async (streamId: string, newOverlay: Partial<overlay>) => {
       try {
@@ -103,6 +109,8 @@ export function OverlayProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Provide the context value to children components
+  // This includes the overlays, loading state, error message, and functions
   return (
     <OverlayContext.Provider
       value={{
@@ -120,6 +128,7 @@ export function OverlayProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Custom hook to use the OverlayContext
 export function useOverlay() {
   const context = useContext(OverlayContext);
   if (context === undefined) {
