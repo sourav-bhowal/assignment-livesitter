@@ -1,4 +1,4 @@
-# Stream Processing API
+# Stream Processing API (Backend)
 
 A Flask-based API for converting RTSP streams to HLS format with overlay management capabilities.
 
@@ -213,9 +213,11 @@ python app.py
 
 Open your web browser and navigate to `http://localhost:5000/api/docs` to access the API documentation and test the endpoints.
 
-## Running the Frontend
+# Frontend (Next.js)
 
 The frontend can interact with the API using standard HTTP requests. You can use libraries like Axios or Fetch API in JavaScript to make requests to the endpoints defined above.
+
+## Running the Frontend
 
 # Prerequisites
 
