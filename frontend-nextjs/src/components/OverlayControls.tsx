@@ -155,7 +155,7 @@ const OverlayControls = ({ streamId }: { streamId: string }) => {
             <Input
               value={newImageUrl}
               onChange={(e) => setNewImageUrl(e.target.value)}
-              placeholder="Image URL..."
+              placeholder="Enter image URL... (Unplash or Bing)"
               className="bg-slate-800/50 border-slate-600 text-white text-sm"
               disabled={isAdding}
             />
