@@ -221,7 +221,7 @@ def api_docs():
 
 # Main entry point to start the app and continuous stream
 if __name__ == '__main__':
-    # start_continuous_stream_on_boot()
+    start_continuous_stream_on_boot()
     app.run(
         debug=os.getenv('DEBUG', 'False') == 'True',
         host=os.getenv('HOST'), 
