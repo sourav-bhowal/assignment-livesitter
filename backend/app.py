@@ -1,3 +1,4 @@
+import shutil
 import os, uuid, subprocess
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -33,7 +34,6 @@ continuous_output_path = f"{continuous_output_dir}/index.m3u8"
 def index():
     return jsonify({"message": "Welcome to the Stream App API"}), 200
 
-# Function to start continuous RTSP stream on boot
 def start_continuous_stream_on_boot():
     global continuous_ffmpeg_process
 
@@ -41,6 +41,10 @@ def start_continuous_stream_on_boot():
     if not rtsp_url:
         print("ERROR: CONTINUOUS_RTSP_URL not set in environment")
         return
+
+    # Delete old HLS output if it exists
+    if os.path.exists(continuous_output_dir):
+        shutil.rmtree(continuous_output_dir)
 
     os.makedirs(continuous_output_dir, exist_ok=True)
 
@@ -69,6 +73,7 @@ def start_continuous_stream_on_boot():
         print(f"HLS stream ready at /hls/{continuous_stream_id}/index.m3u8")
     else:
         print("ERROR: HLS stream not ready in time")
+
 
 # Route to start a new RTSP stream
 @app.route('/api/start-stream', methods=['POST'])
