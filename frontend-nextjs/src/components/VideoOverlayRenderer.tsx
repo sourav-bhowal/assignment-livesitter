@@ -4,8 +4,7 @@ import OverlayItem from "./OverlayItem";
 import { useOverlay } from "@/context/OverlayContext";
 
 const VideoOverlayRenderer = ({ streamId }: { streamId: string }) => {
-  const { overlays, isLoading, loadOverlays, updateOverlay } =
-    useOverlay();
+  const { overlays, isLoading, loadOverlays, updateOverlay } = useOverlay();
 
   // Load overlays on mount
   useEffect(() => {

@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 import axios from "axios";
 import { overlay } from "@/lib/utils";
 
@@ -21,62 +27,75 @@ export function OverlayProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const loadOverlays = useCallback(async (streamId: string) => {
-    try {
-      setError("");
-      if (overlays.length === 0) {
-        setIsLoading(true);
+  const loadOverlays = useCallback(
+    async (streamId: string) => {
+      try {
+        setError("");
+        if (overlays.length === 0) {
+          setIsLoading(true);
+        }
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays/${streamId}`
+        );
+        setOverlays(res.data);
+      } catch (err) {
+        console.error("Failed to load overlays", err);
+        setError("Failed to load overlays");
+      } finally {
+        setIsLoading(false);
       }
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays/${streamId}`
-      );
-      setOverlays(res.data);
-    } catch (err) {
-      console.error("Failed to load overlays", err);
-      setError("Failed to load overlays");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [overlays.length]);
+    },
+    [overlays.length]
+  );
 
-  const addOverlay = useCallback(async (streamId: string, newOverlay: Partial<overlay>) => {
-    try {
-      setError("");
-      const overlayWithStreamId = { ...newOverlay, stream_id: streamId };
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays`,
-        overlayWithStreamId
-      );
-      await loadOverlays(streamId);
-    } catch (err) {
-      console.error("Failed to add overlay", err);
-      setError("Failed to add overlay");
-      throw err;
-    }
-  }, [loadOverlays]);
+  const addOverlay = useCallback(
+    async (streamId: string, newOverlay: Partial<overlay>) => {
+      try {
+        setError("");
+        const overlayWithStreamId = { ...newOverlay, stream_id: streamId };
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays`,
+          overlayWithStreamId
+        );
+        await loadOverlays(streamId);
+      } catch (err) {
+        console.error("Failed to add overlay", err);
+        setError("Failed to add overlay");
+        throw err;
+      }
+    },
+    [loadOverlays]
+  );
 
-  const updateOverlay = useCallback(async (id: string, changes: Partial<overlay>) => {
-    try {
-      setError("");
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays/${id}`,
-        changes
-      );
-      setOverlays(prev => prev.map(overlay => 
-        overlay._id === id ? { ...overlay, ...changes } : overlay
-      ));
-    } catch (err) {
-      console.error("Failed to update overlay", err);
-      setError("Failed to update overlay");
-      throw err;
-    }
-  }, []);
+  const updateOverlay = useCallback(
+    async (id: string, changes: Partial<overlay>) => {
+      try {
+        setError("");
+        await axios.put(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays/${id}`,
+          changes
+        );
+        setOverlays((prev) =>
+          prev.map((overlay) =>
+            overlay._id === id ? { ...overlay, ...changes } : overlay
+          )
+        );
+      } catch (err) {
+        console.error("Failed to update overlay", err);
+        setError("Failed to update overlay");
+        throw err;
+      }
+    },
+    []
+  );
 
   const deleteOverlay = useCallback(async (id: string) => {
     try {
       setError("");
-      await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays/${id}`);
-      setOverlays(prev => prev.filter(overlay => overlay._id !== id));
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/overlays/${id}`
+      );
+      setOverlays((prev) => prev.filter((overlay) => overlay._id !== id));
     } catch (err) {
       console.error("Failed to delete overlay", err);
       setError("Failed to delete overlay");
