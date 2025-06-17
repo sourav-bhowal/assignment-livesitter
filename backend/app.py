@@ -34,6 +34,7 @@ continuous_output_path = f"{continuous_output_dir}/index.m3u8"
 def index():
     return jsonify({"message": "Welcome to the Stream App API"}), 200
 
+# Function to start continuous RTSP stream on boot
 def start_continuous_stream_on_boot():
     global continuous_ffmpeg_process
 
