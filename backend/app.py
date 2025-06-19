@@ -230,6 +230,6 @@ if __name__ == '__main__':
     start_continuous_stream_on_boot()
     app.run(
         debug=os.getenv('DEBUG', 'False') == 'True',
-        host=os.getenv('HOST'), 
+        host=os.getenv('HOST', '0.0.0.0'), 
         port=int(os.getenv('PORT', 5000))
     )
